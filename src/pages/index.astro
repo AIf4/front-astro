@@ -1,13 +1,41 @@
 ---
-import Layout from '../layouts/Layout.astro';
+// astro components
+import Channels from "../components/Channels.astro";
+import Layout from "../layouts/Layout.astro";
+// tsx components
+import NavBar from "../components/NavBar";
+import Members from "../components/Members";
+import Chat from "../components/Chat";
+import type { MembersInterface } from "../utils/interfaces";
+
+const members: MembersInterface[] = [
+  {
+    name: "Pedro",
+    image:
+      "https://wallpapers.com/images/hd/cool-profile-picture-paper-bag-head-4co57dtwk64fb7lv.jpg",
+  },
+  {
+    name: "Juanito",
+    image:
+      "https://wallpapers.com/images/hd/cool-profile-picture-paper-bag-head-4co57dtwk64fb7lv.jpg",
+  },
+];
 ---
 
-<Layout title="Welcome to Astro.">
-	<main>
-		main
-		
-	</main>
-</Layout>
+<Layout title="Chat index.">
+  <main class="flex flex-wrap h-screen">
+    <section class="w-1/6 border-r border-slate-300 bg-slate-600 p-8">
+      <Channels />
+    </section>
+    <section class="w-5/6">
+      <NavBar client:visible />
+      <div class="flex">
+        <!-- {messages.map((message) => <Messages {...message} />)} -->
+        <Chat client:visible />
 
-<style>
-</style>
+        <Members client:visible members={members} />
+      </div>
+    </section>
+  </main>
+</Layout>
+<script></script>
