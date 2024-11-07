@@ -45,7 +45,7 @@ export default function NavBar() {
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-5 inset-y-0 absolute end-0 text-slate-200 h-7 py-1 w-1/6 bg-slate-400 rounded-r-md"
+            class={`size-5 inset-y-0 absolute end-0 text-slate-200 h-7 py-1 w-1/6 bg-slate-400 rounded-r-md`}
           >
             <path
               stroke-linecap="round"
@@ -55,7 +55,7 @@ export default function NavBar() {
           </svg>
         </div>
         <div
-          class="p-1 rounded-full bg-slate-400 shadow-md cursor-pointer"
+          class={`p-1 rounded-full ${!$isMemberOpen ? 'bg-slate-400' : 'bg-slate-700' } shadow-md cursor-pointer`}
           onClick={()=> isMemberOpen.set(!$isMemberOpen)}
         >
           <svg
@@ -64,7 +64,7 @@ export default function NavBar() {
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-5 text-slate-800"
+            class={`size-5 ${!$isMemberOpen ? 'text-slate-800' : 'text-slate-400' } `}
           >
             <path
               stroke-linecap="round"
