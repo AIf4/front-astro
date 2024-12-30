@@ -1,3 +1,9 @@
-import { atom } from "nanostores";
+import { create } from "zustand";
 
-export const isMemberOpen = atom(true);
+const isMemberOpen: any = create((set) => ({
+  isOpen: false,
+  toggleMemberOpen: () =>
+    set((state: any) => ({ isOpen: !state.isOpen })),
+}));
+
+export default isMemberOpen;

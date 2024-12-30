@@ -1,4 +1,5 @@
 ---
+import "@/styles/globals.css";
 // astro components
 import Channels from "../components/Channels.astro";
 import Layout from "../layouts/Layout.astro";
@@ -10,11 +11,13 @@ import type { MembersInterface } from "../utils/interfaces";
 
 const members: MembersInterface[] = [
   {
+    id: 1,
     name: "Pedro",
     image:
       "https://wallpapers.com/images/hd/cool-profile-picture-paper-bag-head-4co57dtwk64fb7lv.jpg",
   },
   {
+    id: 2,
     name: "Juanito",
     image:
       "https://wallpapers.com/images/hd/cool-profile-picture-paper-bag-head-4co57dtwk64fb7lv.jpg",
@@ -30,10 +33,9 @@ const members: MembersInterface[] = [
     <section class="w-5/6">
       <NavBar client:visible />
       <div class="flex">
-        <!-- {messages.map((message) => <Messages {...message} />)} -->
         <Chat client:visible />
 
-        <Members client:visible members={members} />
+        <Members client:only="react" members={members} />
       </div>
     </section>
   </main>

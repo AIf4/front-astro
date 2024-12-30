@@ -1,11 +1,18 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
+import tailwind from "@astrojs/tailwind";
+import node from "@astrojs/node";
 
-import tailwind from '@astrojs/tailwind';
-
-import preact from '@astrojs/preact';
+import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), preact({ devtools: true })]
+  output: "server",
+  integrations: [tailwind({
+    applyBaseStyles: false,
+  }), react()],
+
+  adapter: node({
+    mode: "standalone",
+  }),
 });
