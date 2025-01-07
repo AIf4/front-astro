@@ -17,4 +17,5 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   subfixIcon?: React.ComponentType<{ className?: string }>;
   onClickIcon?: () => void;
   className?: string;
+  showPassword?: boolean;
 }

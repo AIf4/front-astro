@@ -1,6 +1,15 @@
 ---
+import "@/styles/globals.css";
 import Layout from "@/layouts/Layout.astro";
 import RegisterUserComponent from "@/components/RegisterUser";
+import { verifyToken } from "@/lib/utils";
+
+
+const cookie: any = Astro.request.headers.get("cookie");
+const isValidate = await verifyToken(cookie);
+if (isValidate) {
+  return Astro.redirect("/");
+}
 ---
 
 <Layout title="Registrar usuario">
@@ -15,7 +24,8 @@ import RegisterUserComponent from "@/components/RegisterUser";
     <div
       class="w-full px-4 sm:w-full sm:px-6 sm:py-6 lg:w-2/5"
     >
-      <RegisterUserComponent client:only="react"/>
+      <RegisterUserComponent client:visible/>
+      <a href="/auth/login-user" class="flex justify-self-center">Login</a>
     </div>
   </section>
 </Layout>

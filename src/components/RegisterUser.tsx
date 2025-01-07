@@ -1,37 +1,115 @@
-import axios from "axios";
-import { type FormEvent } from "react";
 import { Input } from "./ui/input";
-import { FaUserAstronaut } from "react-icons/fa6";
+import { FaEnvelope, FaUser } from "react-icons/fa6";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "./ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "@/hooks/use-toast";
+import api from "@/lib/axios-config";
+
+const formRegisterSchema = z.object({
+  name: z
+    .string({
+      message: "El campo debe de ser de tipo string",
+    })
+    .trim()
+    .min(2, {
+      message: "El campo debe de tener al menos 2 caracteres",
+    })
+    .max(50, {
+      message: "El campo debe de tener como máximo 50 caracteres",
+    }),
+  nickname: z
+    .string({
+      message: "El campo debe de ser de tipo string",
+    })
+    .trim()
+    .min(2, {
+      message: "El campo debe de tener al menos 2 caracteres",
+    })
+    .max(50, {
+      message: "El campo debe de tener como máximo 50 caracteres",
+    }),
+  email: z
+    .string({
+      message: "El campo debe de ser de tipo string",
+    })
+    .trim()
+    .email({
+      message: "El campo debe de ser un email válido",
+    }),
+  password: z
+    .string({
+      message: "El campo debe de ser de tipo string",
+    })
+    .trim()
+    .regex(
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$/,
+      "La contraseña debe de tener al menos 6 caracteres, una letra mayúscula, una minúscula y un número"
+    ),
+});
 
 const RegisterUser = () => {
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target as HTMLFormElement);
-
-    const signUpData = {
-      username: formData.get("username"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
-
+  //const form = registerUserForm;
+  const form = useForm<z.infer<typeof formRegisterSchema>>({
+    resolver: zodResolver(formRegisterSchema as any),
+    defaultValues: {
+      name: "",
+      nickname: "",
+      email: "",
+      password: "",
+    },
+  });
+  const onSubmit = async (signUpData: z.infer<typeof formRegisterSchema>) => {
+    console.log(signUpData);
     try {
-      const { status, data } = await axios.post(
-        `http://localhost:3000/api/auth/sign-in`,
-        signUpData
-      );
-
-      console.log(status);
-      console.log(data);
+      await api.post(`/api/auth/sign-in`, signUpData);
+      toast({
+        title: "Register success",
+        description: "User has been registered successfully",
+        variant: "default",
+      });
+      form.reset();
     } catch (error: any) {
       if (error.response) {
+        const { data } = error.response;
         // The client received a 4xx or 5xx error response
-        console.error(`Error: ${error.response.data.message}`);
+        const setFormError = (
+          field: "name" | "nickname" | "email" | "password",
+          message: string
+        ) => {
+          form.setError(field, {
+            type: "manual",
+            message: message,
+          });
+        };
+        // Set form errors
+        if (data.field === "email" || data.field === "nickname") {
+          setFormError(data.field, data.message);
+        }
       } else if (error.request) {
         // The client never received a response or the request was aborted
         console.error("Network error");
+        toast({
+          title: "Network error",
+          description: "There was a network error",
+          variant: "destructive",
+        });
       } else {
         // Any other error
+        toast({
+          title: "Unknown error",
+          description: "There was an unknown error",
+          variant: "destructive",
+        });
         console.error("Unknown error");
       }
     }
@@ -43,80 +121,87 @@ const RegisterUser = () => {
         <h1 className="text-5xl font-bold sm:text-3xl text-center">
           Get started today!
         </h1>
-
-        <p className="mt-4 text-gray-500 text-center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero
-          nulla eaque error neque ipsa culpa autem, at itaque nostrum!
+        <p className="text-center text-gray-500 mb-16">
+          Start your journey with us today
         </p>
-
-        <form
-          onSubmit={handleSubmit}
-          className="mx-auto mb-0 mt-8 max-w-md space-y-4"
-        >
-          <div>
-            <label htmlFor="username" className="text-gray-500">
-              Name
-            </label>
-
-            <div className="relative py-2">
-              <Input
-                type="text"
-                subfixIcon={FaUserAstronaut}
-                placeholder="Enter your name"
-                name="username"
-                id="username"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="email" className="text-gray-500">
-              Email
-            </label>
-
-            <div className="relative py-2">
-              <Input
-                type="email"
-                subfixIcon={FaUserAstronaut}
-                placeholder="Enter email"
-                name="email"
-                id="email"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="password" className="text-gray-500">
-              Password
-            </label>
-            <div className="relative py-2">
-              <Input
-                subfixIcon={FaUserAstronaut}
-                placeholder="Enter password"
-                type="password"
-                name="password"
-                id="password"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between py-2">
-            <button
-              type="submit"
-              className="w-full inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white"
-            >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      {...field}
+                      subfixIcon={FaUser}
+                      placeholder="Enter your name"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nickname"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Nickname</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      {...field}
+                      subfixIcon={FaUser}
+                      placeholder="Enter your nickname"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      subfixIcon={FaEnvelope}
+                      placeholder="Enter email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
               Sign up
-            </button>
-          </div>
-
-          <div className="text-center text-sm text-gray-500">
-            <a className="underline" href="#">
-              Sign in
-            </a>
-          </div>
-        </form>
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );
